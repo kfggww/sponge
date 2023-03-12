@@ -4,6 +4,7 @@
 #include "byte_stream.hh"
 
 #include <cstdint>
+#include <set>
 #include <string>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
@@ -11,6 +12,25 @@
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
+
+    class SubString {
+      private:
+        std::string _data;
+        uint64_t _index;
+        bool _eof;
+
+      public:
+        SubString();
+        SubString(const std::string &data, const uint64_t index, const bool eof);
+
+        bool overlap_with(const SubString &other) const;
+        bool operator<(const SubString &other) const;
+
+        static SubString merge_substrings(const SubString &str1, const SubString &str2);
+    };
+
+    std::set<SubString> _substrings{};
+    size_t _len_substrings{};
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
